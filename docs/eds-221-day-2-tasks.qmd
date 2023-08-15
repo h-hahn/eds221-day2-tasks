@@ -1,0 +1,60 @@
+---
+title: "part 2 tasks"
+format: html
+editor: visual
+execute: 
+  warning: false
+---
+
+## PART 2
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+```{r}
+mack_verts <- read_csv(here("data","AS00601.csv")) %>% 
+  clean_names()
+```
+
+```{r}
+mc_wt_5 <- purrr::pluck(mack_verts, "weight", 5)
+
+mc_length_8_20 <- mack_verts$length1[8:20]
+
+mc_dates <- mack_verts$sampledate
+```
+
+```{r}
+mc_salamanders <- mack_verts %>% 
+  filter(species == "DITE")
+```
+
+```{r}
+salamander_plot <- ggplot(mc_salamanders, aes(x = length1, y = weight)) +
+  geom_point(color = "cornflowerblue", size = 0.5, alpha = 0.75) +
+  labs(title = "Salamander SVL vs weight", x = "SVL (mm)", y = "Weight (g)", caption = "Data from Aquatic Vertebrate Population Study in Mack Creek, Andrews Experimental Forest, 1987 to present", subtitle = "svl vs weight") +
+  theme_light() +
+  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "inches"))
+
+ggsave(filename = here("figs", "salamander_size.png"), plot = salamander_plot)
+```
+
+```{r}
+mc_trout <- mack_verts %>% 
+  filter(species == "ONCL")
+```
+
+```{r}
+trout_plot <- ggplot(mc_trout, aes(x = length1, y = weight, color = reach)) +
+  scale_color_manual(values = c("L" = "pink2", "M" = "palegreen3", "U" = "lightblue3")) +
+  geom_point(size = 0.5, alpha = 0.75) +
+  facet_wrap(~reach) +
+  labs(title = "Trout length vs weight", x = "Length (mm)", y = "Weight (g)", caption = "Data from Aquatic Vertebrate Population Study in Mack Creek, Andrews Experimental Forest, 1987 to present", subtitle = "length vs weight") +
+  theme_light() +
+  theme(plot.margin = unit(c(0.5, 0.5, 0.5, 0.5), "inches"))
+
+ggsave(filename = here("figs", "cutthroat_size.png"), plot = trout_plot, height = 5, width = 7)
+```
